@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Cuaca Hari Ini</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #e0f7fa;
+      padding: 20px;
+      text-align: center;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      margin: 10px;
+    }
+    #hasil {
+      margin-top: 20px;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      display: inline-block;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      min-width: 250px;
+    }
+    img {
+      width: 80px;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🌤️ Cek Cuaca Berdasarkan Kota</h2>
+  <input type="text" id="kota" placeholder="Masukkan nama kota">
+  <button onclick="cekCuaca()">Cek Cuaca</button>
+
+  <div id="hasil"></div>
+
+  <script>
+    async function cekCuaca() {
+      const kota = document.getElementById("kota").value.trim();
+      const hasil = document.getElementById("hasil");
+      const apiKey = "59a4334c873d3ec90feb38d2c875518f"; 
+
+      if (!kota) {
+        hasil.innerHTML = "<p class='error'>❗ Masukkan nama kota terlebih dahulu.</p>";
+        return;
+      }
+
+      hasil.innerHTML = "⏳ Mengambil data cuaca...";
+
+      const url = `https://api.openweathermap.org/data/2.5/weather?q=${kota}&appid=${apiKey}&units=metric&lang=id`;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Kota tidak ditemukan");
+
+        const data = await response.json();
+        const suhu = data.main.temp;
+        const deskripsi = data.weather[0].description;
+        const ikon = data.weather[0].icon;
+        const kelembapan = data.main.humidity;
+        const angin = data.wind.speed;
+        const gambar = `https://openweathermap.org/img/wn/${ikon}@2x.png`;
+
+        hasil.innerHTML = `
+          <h3>Cuaca di ${data.name}</h3>
+          <img src="${gambar}" alt="ikon cuaca">
+          <p><strong>${suhu}°C</strong> - ${deskripsi}</p>
+          <p>Kelembapan: ${kelembapan}%</p>
+          <p>Angin: ${angin} m/s</p>
+        `;
+      } catch (error) {
+        hasil.innerHTML = `<p class='error'>❗ ${error.message}</p>`;
+      }
+    }
+  </script>
+
+</body>
+</html>
